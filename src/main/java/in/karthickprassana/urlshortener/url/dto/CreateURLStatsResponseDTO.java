@@ -5,18 +5,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
-@Getter
 @Setter
+@Getter
 @Builder
 @AllArgsConstructor
 
-public class URLStatsResponseDTO {
+public class CreateURLStatsResponseDTO {
 
     private Long statsId;
-    private Long totalClicks;
     private Long mobileCount;
     private Long desktopCount;
-    private LocalDateTime lastClickedAt;
+    private Long totalClicks;
+
 }

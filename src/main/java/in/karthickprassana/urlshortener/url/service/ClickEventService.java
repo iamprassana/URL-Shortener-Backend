@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Service
@@ -38,15 +39,30 @@ public class ClickEventService {
         clickEventRepository.save(clickEvent);
     }
 
-    public void getClickEvents(Long urlId, int pageNo, int size) {
+    public List<ClickEventDTO> getClickEvents(Long urlId, int pageNo, int size) {
 
         if(!urlRepository.existsById(urlId)) {
             throw new RuntimeException("Url does not exist");
-        }
+
+    }
 
         Pageable pageable = PageRequest.of(pageNo, size, Sort.by("clicked_at").descending());
 
-        clickEventRepository.findByUrlId(urlId, pageable);
+        List<ClickEvent> response = clickEventRepository.findByUrlId(urlId, pageable)
+                .orElseThrow(() -> new RuntimeException("Something went wrong." ));
+        return response.stream()
+                .map(event -> ClickEventDTO
+                        .builder()
+                        .deviceType(event.getDevice())
+                        .browserType(event.getBrowser())
+                        .country(event.getCountry())
+                        .ip(event.getIpAddress())
+                        .os(event.getOs())
+                        .urlId(event.getUrl().getId())
+                        .clickedAt(event.getClickedAt())
+                        .url(event.getUrl().getDestinationURL())
+                        .build()
+                ).toList();
 
     }
 }

@@ -13,7 +13,7 @@ public class RandomStringUtils {
 
     public RandomStringUtils() {}
 
-    public static String generateString(int n) {
+    public String generateString(int n) {
 
         StringBuilder sb = new StringBuilder();
 

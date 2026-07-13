@@ -1,7 +1,6 @@
 package in.karthickprassana.urlshortener.url.service;
 
-import in.karthickprassana.urlshortener.url.dto.CreateURLRequestDTO;
-import in.karthickprassana.urlshortener.url.dto.SingleURLResponseDTO;
+import in.karthickprassana.urlshortener.url.dto.*;
 import in.karthickprassana.urlshortener.url.entity.URL;
 import in.karthickprassana.urlshortener.url.repository.URLRepository;
 import in.karthickprassana.urlshortener.url.utils.RandomStringUtils;
@@ -12,7 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,29 +20,32 @@ public class URLService {
 
     private final URLRepository urlRepository;
     private final UserRepository userRepository;
+    private final URLStatsService urlStatsService;
+    private final ClickEventService clickEventService;
     private final RandomStringUtils randomStringUtils;
 
     public boolean checkIsUnique(String url) {
-        return urlRepository.findShortenedURL(url).isPresent();
+        return urlRepository.existsURLByShortenedURL(url);
     }
 
-    public SingleURLResponseDTO addURL(CreateURLRequestDTO data) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        String uniqueURL = "";
+    public String generateURL() {
+        String key;
+        do {
+            key = randomStringUtils.generateString(7);
+        }while (!checkIsUnique(key));
+        return key;
+    }
 
-        if(data.getUniqueName() != null && !data.getOriginalURL().isEmpty()) {
-            if(checkIsUnique(data.getUniqueName())) {
-                uniqueURL = data.getUniqueName();
-            }
-        }else {
-            String key;
-            do {
-                key = RandomStringUtils.generateString(7);
-            }while (!checkIsUnique(key));
-            uniqueURL = key;
-        }
+    public String getOriginalURL(String shortenedURL) {
+        return urlRepository
+                .findShortenedURL(shortenedURL)
+                .orElseThrow(
+                        () -> new RuntimeException("URL does not exist")
+                )
+                .getDestinationURL();
+    }
 
-
+    private SingleURLResponseDTO getSingleURLResponseDTO(CreateURLRequestDTO data, String email, String uniqueURL) {
         User user = userRepository
                 .findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User does not exist."));
@@ -64,9 +66,35 @@ public class URLService {
                 .build();
     }
 
+    public SingleURLResponseDTO addCustomURL(CreateURLRequestDTO data) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        String uniqueURL = "";
+
+        if(data.getUniqueName() != null && !data.getOriginalURL().isEmpty()) {
+            if(checkIsUnique(data.getUniqueName())) {
+                uniqueURL = data.getUniqueName();
+            }else {
+                throw new RuntimeException("URL already taken");
+            }
+        }
+
+
+        return getSingleURLResponseDTO(data, email, uniqueURL);
+    }
+
+    public SingleURLResponseDTO createWithGeneratedURL(CreateURLRequestDTO data) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        String uniqueURL = generateURL();
+
+
+        return getSingleURLResponseDTO(data, email, uniqueURL);
+    }
+
+
+
 
     public void deleteURL(Long id) {
-        URL url = urlRepository.findById(id).orElseThrow(() -> new RuntimeException("Url does not exist"));
+        URL url = urlRepository.findById(id).orElseThrow(() -> new RuntimeException("URL does not exist"));
         urlRepository.delete(url);
     }
 
@@ -75,8 +103,58 @@ public class URLService {
             throw new RuntimeException("This name already exists");
         }
 
-        URL url = urlRepository.findShortenedURL(newShortenedURL).orElseThrow(() -> new RuntimeException("Url does not exists"));
+        URL url = urlRepository.findShortenedURL(newShortenedURL).orElseThrow(() -> new RuntimeException("URL does not exists"));
         url.setShortenedURL(newShortenedURL);
         urlRepository.save(url);
+    }
+
+    public List<DetailedURLResponseDTO> getURLs() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        List<URL> urls = urlRepository.findByUserEmail(email);
+
+        return urls.stream()
+                .map(url -> {
+                    Long id = url.getId();
+
+                    SingleURLResponseDTO urlDetail = SingleURLResponseDTO.builder()
+                            .id(id)
+                            .originalUrl(url.getDestinationURL())
+                            .shortenedUrl(url.getShortenedURL())
+                            .createdAt(url.getCreatedAt())
+                            .build();
+
+                    URLStatsResponseDTO urlStats = urlStatsService.getUrlStats(id);
+
+                    List<ClickEventDTO> clickEvents =
+                            clickEventService.getClickEvents(id, 1, 20);
+
+                    return DetailedURLResponseDTO.builder()
+                            .urlDetail(urlDetail)
+                            .urlStats(urlStats)
+                            .clickEvents(clickEvents)
+                            .build();
+                })
+                .toList();
+    }
+
+    public DetailedURLResponseDTO getURL(String shortenedURL) {
+        URL response =  urlRepository.findShortenedURL(shortenedURL).orElseThrow(() -> new RuntimeException("URL does not exist"));
+        Long id = response.getId();
+        SingleURLResponseDTO data = SingleURLResponseDTO
+                .builder()
+                .id(id)
+                .originalUrl(response.getDestinationURL())
+                .shortenedUrl(response.getShortenedURL())
+                .build();
+        URLStatsResponseDTO urlStats = urlStatsService.getUrlStats(id);
+        List<ClickEventDTO> clickEvents = clickEventService.getClickEvents(id, 1, 20);
+
+        return DetailedURLResponseDTO
+                .builder()
+                .urlDetail(data)
+                .urlStats(urlStats)
+                .clickEvents(clickEvents)
+                .build();
     }
 }

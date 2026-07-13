@@ -1,5 +1,6 @@
 package in.karthickprassana.urlshortener.url.service;
 
+import in.karthickprassana.urlshortener.url.dto.CreateURLStatsResponseDTO;
 import in.karthickprassana.urlshortener.url.dto.URLStatsDTO;
 import in.karthickprassana.urlshortener.url.dto.URLStatsResponseDTO;
 import in.karthickprassana.urlshortener.url.entity.URL;
@@ -30,8 +31,8 @@ public class URLStatsService {
         URLStats urlStats = optionalURLStats.get();
 
         return URLStatsResponseDTO
-                .builder().
-                id(urlStats.getId())
+                .builder()
+                .statsId(urlStats.getId())
                 .desktopCount(urlStats.getDesktopCount())
                 .mobileCount(urlStats.getMobileCount())
 //                .lastClickedAt(urlStats.getLastClickedAt())
@@ -39,16 +40,23 @@ public class URLStatsService {
                 .build();
     }
 
-    public void updateUrlStats(Long statsId, URLStatsDTO data) {
+    public URLStatsResponseDTO updateUrlStats(Long statsId, URLStatsDTO data) {
         URLStats stats = urlStatsRepository.findById(statsId).orElseThrow(() -> new RuntimeException("URL does not exist"));
         stats.setDesktopCount(data.getDesktopCount());
         stats.setMobileCount(data.getMobileCount());
         stats.setTotalClicks(data.getTotalClicks());
 
-        urlStatsRepository.save(stats);
+        stats = urlStatsRepository.save(stats);
+        return URLStatsResponseDTO
+                .builder()
+                .statsId(stats.getId())
+                .desktopCount(stats.getDesktopCount())
+                .mobileCount(stats.getMobileCount())
+                .totalClicks(stats.getTotalClicks())
+                .build();
     }
 
-    public void createUrlStats(Long urlId) {
+    public CreateURLStatsResponseDTO createUrlStats(Long urlId) {
         URL url = urlRepository.findById(urlId).orElseThrow(() -> new RuntimeException("URL does not exist"));
         URLStats newStats = URLStats
                 .builder()
@@ -57,8 +65,16 @@ public class URLStatsService {
                 .mobileCount(0L)
                 .url(url)
                 .build();
-        urlStatsRepository.save(newStats);
+        newStats = urlStatsRepository.save(newStats);;
 
-        //TODO: Return the created stats
+        CreateURLStatsResponseDTO responseDTO = CreateURLStatsResponseDTO
+                .builder()
+                .statsId(newStats.getId())
+                .desktopCount(newStats.getDesktopCount())
+                .mobileCount(newStats.getMobileCount())
+                .totalClicks(newStats.getTotalClicks())
+                .build();
+
+        return responseDTO;
     }
 }

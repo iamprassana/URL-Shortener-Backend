@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 
 public class SingleURLResponseDTO {
-
+    private final Long id;
     private final String originalUrl;
     private final String shortenedUrl;
     private LocalDateTime createdAt;
