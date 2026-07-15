@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Table(
         name = "url_stats",
         indexes = {
-                @Index(name = "idx_url_id", columnList = "url_id")
+                @Index(name = "idx_url_stats_id", columnList = "url_id")
         }
 )
 @Getter

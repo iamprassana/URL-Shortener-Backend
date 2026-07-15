@@ -49,4 +49,9 @@ public class URLController {
         urlService.deleteURL(id);
         return ResponseEntity.ok("Successfully deleted");
     }
+
+    @GetMapping("get-unique-url")
+    public ResponseEntity<String> getUniqueURL() {
+        return ResponseEntity.ok(urlService.generateURL());
+    }
 }

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Table(
         name = "click_event",
         indexes = {
-                @Index(name = "idx_url_id", columnList = "url_id"),
+                @Index(name = "idx_click_event_id", columnList = "url_id"),
                 @Index(name = "idx_url_clicked", columnList = "url_id, clicked_at")
         }
 )

@@ -14,19 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 
 @RestController
-
 @RequiredArgsConstructor
-
 public class EventRegisterController {
 
     private final URLService urlService;
-    //TODO: Create a kafka producer class
+    //TODO: Create a Kafka producer class
 
     @GetMapping("/{url}")
     public ResponseEntity<Void> redirectUser(@PathVariable String url, HttpServletRequest http) {
 
         String destinationURL = urlService.getOriginalURL(url);
-        //Register the event using kafka
+        //Register the event using Kafka
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(destinationURL))

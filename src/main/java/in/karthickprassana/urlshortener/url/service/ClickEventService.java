@@ -23,7 +23,7 @@ public class ClickEventService {
     private final URLRepository urlRepository;
 
     public void addClickEvent(ClickEventDTO data) {
-        URL url = urlRepository.findShortenedURL(data.getUrl()).orElseThrow(() -> new RuntimeException("No url exists"));
+        URL url = urlRepository.findByShortenedURL(data.getUrl()).orElseThrow(() -> new RuntimeException("No url exists"));
 
         ClickEvent clickEvent = ClickEvent
                 .builder()

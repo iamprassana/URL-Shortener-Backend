@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface URLRepository extends JpaRepository<URL, Long> {
 
-    Optional<URL> findShortenedURL(String url);
+    Optional<URL> findByShortenedURL(String shortenedURL);
     boolean existsURLByShortenedURL(String url);
     List<URL> findByUserEmail(String email);
 }

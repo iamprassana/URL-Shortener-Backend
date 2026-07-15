@@ -38,7 +38,7 @@ public class URLService {
 
     public String getOriginalURL(String shortenedURL) {
         return urlRepository
-                .findShortenedURL(shortenedURL)
+                .findByShortenedURL(shortenedURL)
                 .orElseThrow(
                         () -> new RuntimeException("URL does not exist")
                 )
@@ -86,7 +86,6 @@ public class URLService {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         String uniqueURL = generateURL();
 
-
         return getSingleURLResponseDTO(data, email, uniqueURL);
     }
 
@@ -103,7 +102,7 @@ public class URLService {
             throw new RuntimeException("This name already exists");
         }
 
-        URL url = urlRepository.findShortenedURL(newShortenedURL).orElseThrow(() -> new RuntimeException("URL does not exists"));
+        URL url = urlRepository.findByShortenedURL(newShortenedURL).orElseThrow(() -> new RuntimeException("URL does not exists"));
         url.setShortenedURL(newShortenedURL);
         urlRepository.save(url);
     }
@@ -139,7 +138,7 @@ public class URLService {
     }
 
     public DetailedURLResponseDTO getURL(String shortenedURL) {
-        URL response =  urlRepository.findShortenedURL(shortenedURL).orElseThrow(() -> new RuntimeException("URL does not exist"));
+        URL response =  urlRepository.findByShortenedURL(shortenedURL).orElseThrow(() -> new RuntimeException("URL does not exist"));
         Long id = response.getId();
         SingleURLResponseDTO data = SingleURLResponseDTO
                 .builder()

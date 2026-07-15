@@ -1,16 +1,13 @@
 package in.karthickprassana.urlshortener.url.dto;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Builder
-@RequiredArgsConstructor
+@AllArgsConstructor
 
 public class SingleURLResponseDTO {
     private final Long id;
