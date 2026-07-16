@@ -7,6 +7,7 @@ import in.karthickprassana.urlshortener.url.entity.URL;
 import in.karthickprassana.urlshortener.url.entity.URLStats;
 import in.karthickprassana.urlshortener.url.repository.URLRepository;
 import in.karthickprassana.urlshortener.url.repository.URLStatsRepository;
+import in.karthickprassana.urlshortener.url.utils.DeviceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,17 @@ public class URLStatsService {
 
     private final URLStatsRepository urlStatsRepository;
     private final URLRepository urlRepository;
+
+    public void incrementData(Long id, DeviceType type) {
+        URLStats stats = urlStatsRepository.findByUrlId(id).orElseThrow(() -> new RuntimeException("No stat found for the given url."));
+        stats.setTotalClicks(stats.getTotalClicks() + 1);
+        if(type == DeviceType.DESKTOP) {
+            stats.setDesktopCount(stats.getDesktopCount() + 1);
+        }else if(type == DeviceType.MOBILE) {
+            stats.setMobileCount(stats.getMobileCount() + 1);
+        }
+        urlStatsRepository.save(stats);
+    }
 
     public URLStatsResponseDTO getUrlStats(Long urlId) {
 
@@ -40,21 +52,21 @@ public class URLStatsService {
                 .build();
     }
 
-    public URLStatsResponseDTO updateUrlStats(Long statsId, URLStatsDTO data) {
-        URLStats stats = urlStatsRepository.findById(statsId).orElseThrow(() -> new RuntimeException("URL does not exist"));
-        stats.setDesktopCount(data.getDesktopCount());
-        stats.setMobileCount(data.getMobileCount());
-        stats.setTotalClicks(data.getTotalClicks());
-
-        stats = urlStatsRepository.save(stats);
-        return URLStatsResponseDTO
-                .builder()
-                .statsId(stats.getId())
-                .desktopCount(stats.getDesktopCount())
-                .mobileCount(stats.getMobileCount())
-                .totalClicks(stats.getTotalClicks())
-                .build();
-    }
+//    public URLStatsResponseDTO updateUrlStats(Long statsId, URLStatsDTO data) {
+//        URLStats stats = urlStatsRepository.findById(statsId).orElseThrow(() -> new RuntimeException("URL does not exist"));
+//        stats.setDesktopCount(data.getDesktopCount());
+//        stats.setMobileCount(data.getMobileCount());
+//        stats.setTotalClicks(data.getTotalClicks());
+//
+//        stats = urlStatsRepository.save(stats);
+//        return URLStatsResponseDTO
+//                .builder()
+//                .statsId(stats.getId())
+//                .desktopCount(stats.getDesktopCount())
+//                .mobileCount(stats.getMobileCount())
+//                .totalClicks(stats.getTotalClicks())
+//                .build();
+//    }
 
     public CreateURLStatsResponseDTO createUrlStats(Long urlId) {
         URL url = urlRepository.findById(urlId).orElseThrow(() -> new RuntimeException("URL does not exist"));

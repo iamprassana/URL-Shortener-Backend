@@ -32,8 +32,14 @@ public class URLService {
         String key;
         do {
             key = randomStringUtils.generateString(7);
-        }while (!checkIsUnique(key));
+        }while (checkIsUnique(key));
         return key;
+    }
+
+    public Long getId(String shortenedURL) {
+        return urlRepository.findByShortenedURL(shortenedURL)
+                .orElseThrow(() -> new RuntimeException("URL does not exist"))
+                .getId();
     }
 
     public String getOriginalURL(String shortenedURL) {
@@ -51,6 +57,7 @@ public class URLService {
                 .orElseThrow(() -> new RuntimeException("User does not exist."));
         URL newURL = URL
                 .builder()
+                .urlName(data.getUrlName())
                 .destinationURL(data.getOriginalURL())
                 .shortenedURL(uniqueURL)
                 .createdAt(LocalDateTime.now())
@@ -58,11 +65,15 @@ public class URLService {
                 .build();
 
         urlRepository.save(newURL);
+        urlStatsService.createUrlStats(newURL.getId());
 
         return SingleURLResponseDTO
                 .builder()
-                .originalUrl(data.getOriginalURL())
-                .shortenedUrl(uniqueURL)
+                .id(newURL.getId())
+                .name(newURL.getUrlName())
+                .originalUrl(newURL.getDestinationURL())
+                .shortenedUrl(newURL.getShortenedURL())
+                .createdAt(newURL.getCreatedAt())
                 .build();
     }
 

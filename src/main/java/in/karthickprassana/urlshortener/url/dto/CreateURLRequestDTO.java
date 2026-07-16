@@ -10,6 +10,7 @@ import lombok.Setter;
 
 public class CreateURLRequestDTO {
     private final String originalURL;
-    private final String userId;
+    private final String urlName;
+//    private final String userId;
     private final String uniqueName;
 }

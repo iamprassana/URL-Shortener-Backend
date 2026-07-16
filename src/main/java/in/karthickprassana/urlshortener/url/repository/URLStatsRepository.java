@@ -8,4 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface URLStatsRepository extends JpaRepository<URLStats, Long> {
+    Optional<URLStats> findByUrlId(Long urlId);
 }

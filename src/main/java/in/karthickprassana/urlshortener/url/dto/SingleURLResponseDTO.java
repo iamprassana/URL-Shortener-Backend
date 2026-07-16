@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 public class SingleURLResponseDTO {
     private final Long id;
+    private final String name;
     private final String originalUrl;
     private final String shortenedUrl;
     private LocalDateTime createdAt;

@@ -25,6 +25,9 @@ public class URL {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "url_name")
+    private String urlName;
+
     @Column(name = "destination_url", nullable = false)
     private String destinationURL;
 

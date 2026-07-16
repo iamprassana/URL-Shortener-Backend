@@ -19,9 +19,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class URLController {
 
-    private URLService urlService;
-    private ClickEventService clickEventService;
-    private URLStatsService urlStatsService;
+    private final URLService urlService;
+    private final ClickEventService clickEventService;
+    private final URLStatsService urlStatsService;
 
     @PostMapping("create-custom")
     public ResponseEntity<SingleURLResponseDTO> createWithCustomURL(@RequestBody @Valid CreateURLRequestDTO data) {
