@@ -34,7 +34,7 @@ public class URLStatsService {
 
     public URLStatsResponseDTO getUrlStats(Long urlId) {
 
-        Optional<URLStats> optionalURLStats = urlStatsRepository.findById(urlId);
+        Optional<URLStats> optionalURLStats = urlStatsRepository.findByUrlId(urlId);
 
         if(optionalURLStats.isEmpty()) {
             throw new RuntimeException("No stats exist for this URL");

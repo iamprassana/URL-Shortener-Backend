@@ -39,7 +39,7 @@ public class UserService  {
             throw new RuntimeException("Password is incorrect.");
         }
 
-        String token = "Bearer " + jwtUtil.generateToken(userData.getEmail());
+        String token = jwtUtil.generateToken(userData.getEmail());
 
         UserResponseDTO response = UserResponseDTO
                 .builder()

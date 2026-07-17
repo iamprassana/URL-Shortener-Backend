@@ -120,7 +120,6 @@ public class URLService {
 
     public List<DetailedURLResponseDTO> getURLs() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
         List<URL> urls = urlRepository.findByUserEmail(email);
 
         return urls.stream()
@@ -137,7 +136,7 @@ public class URLService {
                     URLStatsResponseDTO urlStats = urlStatsService.getUrlStats(id);
 
                     List<ClickEventDTO> clickEvents =
-                            clickEventService.getClickEvents(id, 1, 20);
+                            clickEventService.getClickEvents(id, 0, 20);
 
                     return DetailedURLResponseDTO.builder()
                             .urlDetail(urlDetail)

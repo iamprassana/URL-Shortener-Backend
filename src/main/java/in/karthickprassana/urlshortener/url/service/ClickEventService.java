@@ -40,13 +40,13 @@ public class ClickEventService {
     }
 
     public List<ClickEventDTO> getClickEvents(Long urlId, int pageNo, int size) {
-
+        System.out.println("ID = " + urlId);
         if(!urlRepository.existsById(urlId)) {
             throw new RuntimeException("Url does not exist");
 
-    }
+        }
 
-        Pageable pageable = PageRequest.of(pageNo, size, Sort.by("clicked_at").descending());
+        Pageable pageable = PageRequest.of(pageNo, size, Sort.by("clickedAt").descending());
 
         List<ClickEvent> response = clickEventRepository.findByUrlId(urlId, pageable)
                 .orElseThrow(() -> new RuntimeException("Something went wrong." ));
