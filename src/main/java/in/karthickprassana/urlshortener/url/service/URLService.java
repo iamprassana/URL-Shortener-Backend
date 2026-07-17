@@ -118,7 +118,7 @@ public class URLService {
         urlRepository.save(url);
     }
 
-    public List<DetailedURLResponseDTO> getURLs() {
+    public List<DetailedURLResponseDTO> getURLs(int pageNo) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         List<URL> urls = urlRepository.findByUserEmail(email);
 
@@ -136,7 +136,7 @@ public class URLService {
                     URLStatsResponseDTO urlStats = urlStatsService.getUrlStats(id);
 
                     List<ClickEventDTO> clickEvents =
-                            clickEventService.getClickEvents(id, 0, 20);
+                            clickEventService.getClickEvents(id, pageNo - 1, 20);
 
                     return DetailedURLResponseDTO.builder()
                             .urlDetail(urlDetail)

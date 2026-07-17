@@ -35,8 +35,8 @@ public class URLController {
     }
 
     @GetMapping("get-urls")
-    public ResponseEntity<List<DetailedURLResponseDTO>> getURLS() {
-        return ResponseEntity.ok(urlService.getURLs());
+    public ResponseEntity<List<DetailedURLResponseDTO>> getURLS(@RequestParam int pageNo) {
+        return ResponseEntity.ok(urlService.getURLs(pageNo));
     }
 
     @GetMapping("get-url/{url}")
